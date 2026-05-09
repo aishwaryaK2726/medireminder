@@ -1,7 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Register() {
+
+  const navigate = useNavigate();
 
   const [user, setUser] = useState({
     name: "",
@@ -21,54 +25,80 @@ function Register() {
 
     e.preventDefault();
 
-    await axios.post(
-      "http://localhost:5000/auth/register",
-      user
-    );
+    try {
 
-    alert("Registered Successfully");
+      await axios.post(
+        "http://localhost:5000/auth/register",
+        user
+      );
+
+      // SUCCESS MESSAGE
+      toast.success(
+        "Registered Successfully! Redirecting to login..."
+      );
+
+      // REDIRECT AFTER 5 SECONDS
+      setTimeout(() => {
+
+        navigate("/login");
+
+      }, 5000);
+
+    } catch (error) {
+
+      toast.error("Registration Failed");
+    }
   };
 
   return (
 
-    <div className="container">
+    <div className="register-page">
 
-      <h2>Register</h2>
+      <div className="auth-container">
 
-      <form onSubmit={handleSubmit}>
+        <div className="auth-card">
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          onChange={handleChange}
-        />
+          <h2>Register</h2>
 
-        <br /><br />
+          <p>
+            Create your MediReminder account
+          </p>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
+          <form onSubmit={handleSubmit}>
 
-        <br /><br />
+            <input
+              type="text"
+              name="name"
+              placeholder="Name"
+              onChange={handleChange}
+              required
+            />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              onChange={handleChange}
+              required
+            />
 
-        <br /><br />
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              onChange={handleChange}
+              required
+            />
 
-        <button type="submit">
-          Register
-        </button>
+            <button type="submit">
+              Register
+            </button>
 
-      </form>
+          </form>
+
+        </div>
+
+      </div>
 
     </div>
   );

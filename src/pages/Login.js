@@ -1,8 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Login({ setIsLoggedIn }) {
+
   const navigate = useNavigate();
 
   const [user, setUser] = useState({
@@ -11,6 +13,7 @@ function Login({ setIsLoggedIn }) {
   });
 
   const handleChange = (e) => {
+
     setUser({
       ...user,
       [e.target.name]: e.target.value,
@@ -18,66 +21,82 @@ function Login({ setIsLoggedIn }) {
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
 
     try {
+
       const res = await axios.post(
         "http://localhost:5000/auth/login",
         user
       );
 
-      // SAVE TOKEN IN SESSION STORAGE
+      // SAVE TOKEN
       sessionStorage.setItem(
         "token",
         res.data.token
       );
 
+      // LOGIN STATE
       setIsLoggedIn(true);
 
-      alert("Login Successful");
+      // SUCCESS MESSAGE
+      toast.success(
+        "Login Successful! Redirecting..."
+      );
 
-      navigate("/dashboard");
+      // REDIRECT AFTER 5 SECONDS
+      setTimeout(() => {
+
+        navigate("/dashboard");
+
+      }, 5000);
 
     } catch (error) {
 
-      alert("Invalid Credentials");
+      toast.error("Invalid Credentials");
     }
   };
 
   return (
-    <div className="auth-container">
 
-      <div className="auth-card">
+    <div className="login-page">
 
-        <h2>Welcome Back</h2>
+      <div className="auth-container">
 
-        <p>
-          Login to manage your medicine reminders
-        </p>
+        <div className="auth-card">
 
-        <form onSubmit={handleSubmit}>
+          <h2>Welcome Back</h2>
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter Email"
-            onChange={handleChange}
-            required
-          />
+          <p>
+            Login to manage your medicine reminders
+          </p>
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Enter Password"
-            onChange={handleChange}
-            required
-          />
+          <form onSubmit={handleSubmit}>
 
-          <button type="submit">
-            Login
-          </button>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter Email"
+              onChange={handleChange}
+              required
+            />
 
-        </form>
+            <input
+              type="password"
+              name="password"
+              placeholder="Enter Password"
+              onChange={handleChange}
+              required
+            />
+
+            <button type="submit">
+              Login
+            </button>
+
+          </form>
+
+        </div>
 
       </div>
 

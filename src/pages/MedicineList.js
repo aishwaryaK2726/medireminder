@@ -3,6 +3,8 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import alarmSound from "../assets/alarm.mp3";
+
 function MedicineList() {
   const [medicines, setMedicines] = useState([]);
   const [search, setSearch] = useState("");
@@ -10,7 +12,7 @@ function MedicineList() {
 
   const fetchMedicines = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       const res = await axios.get("http://localhost:5000/medicines", {
         headers: {
@@ -20,13 +22,13 @@ function MedicineList() {
 
       setMedicines(res.data);
     } catch (error) {
-      console.log(error);
+      console.log(error.response?.data || error);
     }
   };
 
   const deleteMedicine = async (id) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       await axios.delete(`http://localhost:5000/medicines/${id}`, {
         headers: {
@@ -36,8 +38,46 @@ function MedicineList() {
 
       fetchMedicines();
     } catch (error) {
-      console.log(error);
+      console.log(error.response?.data || error);
     }
+  };
+
+  const markAsTaken = async (med) => {
+    try {
+      const token = sessionStorage.getItem("token");
+
+      const today = new Date().toLocaleDateString();
+
+      await axios.post(
+        "http://localhost:5000/history/add",
+        {
+          medicineId: med._id,
+          medicineName: med.medicineName,
+          dosage: med.dosage,
+          time: med.time,
+          status: "Taken",
+          date: today,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success(`${med.medicineName} marked as Taken`);
+    } catch (error) {
+      console.log(error.response?.data || error);
+      alert("Error marking medicine as taken");
+    }
+  };
+
+  const playAlarm = () => {
+    const alarm = new Audio(alarmSound);
+
+    alarm.play().catch((error) => {
+      console.log("Alarm play blocked:", error);
+    });
   };
 
   useEffect(() => {
@@ -63,6 +103,8 @@ function MedicineList() {
 
         if (med.time === currentTime && !notified[reminderKey]) {
           toast.success(`Time to take ${med.medicineName}`);
+
+          playAlarm();
 
           alert(
             `Reminder: Time to take ${med.medicineName}\nDosage: ${med.dosage}`
@@ -99,10 +141,14 @@ function MedicineList() {
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {medicines
-        .filter((med) =>
-          med.medicineName.toLowerCase().includes(search.toLowerCase())
-        )
+      {medicines.length === 0 && (
+  <p>No medicines added yet.</p>
+)}
+
+{medicines
+  .filter((med) =>
+    med.medicineName.toLowerCase().includes(search.toLowerCase())
+  )
         .map((med) => (
           <div key={med._id} className="medicine-card">
             <h3>{med.medicineName}</h3>
@@ -111,11 +157,17 @@ function MedicineList() {
             <p>Time: {med.time}</p>
             <p>Frequency: {med.frequency}</p>
 
+            <button onClick={() => markAsTaken(med)}>
+              Mark as Taken
+            </button>
+
             <Link to={`/edit/${med._id}`}>
               <button>Edit</button>
             </Link>
 
-            <button onClick={() => deleteMedicine(med._id)}>Delete</button>
+            <button onClick={() => deleteMedicine(med._id)}>
+              Delete
+            </button>
           </div>
         ))}
     </div>

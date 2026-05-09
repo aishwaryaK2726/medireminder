@@ -1,7 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function AddMedicine() {
+  const navigate = useNavigate();
+
   const [medicine, setMedicine] = useState({
     medicineName: "",
     dosage: "",
@@ -20,7 +24,7 @@ function AddMedicine() {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
 
       await axios.post("http://localhost:5000/medicines/add", medicine, {
         headers: {
@@ -28,7 +32,7 @@ function AddMedicine() {
         },
       });
 
-      alert("Medicine Added Successfully");
+      toast.success("Medicine Added Successfully");
 
       setMedicine({
         medicineName: "",
@@ -36,9 +40,14 @@ function AddMedicine() {
         time: "",
         frequency: "",
       });
+
+      setTimeout(() => {
+        navigate("/medicines");
+      }, 1000);
+
     } catch (error) {
-      console.log(error);
-      alert("Error adding medicine");
+      console.log(error.response?.data || error);
+      toast.error("Error adding medicine");
     }
   };
 

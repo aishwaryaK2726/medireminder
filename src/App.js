@@ -10,7 +10,6 @@ import {
 
 import {
   useState,
-  useEffect,
 } from "react";
 
 import Home from "./pages/Home";
@@ -22,6 +21,7 @@ import MedicineList from "./pages/MedicineList";
 import EditMedicine from "./pages/EditMedicine";
 import Schedule from "./pages/Schedule";
 import Help from "./pages/Help";
+import History from "./pages/History";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,33 +44,7 @@ function App() {
     setIsLoggedIn(false);
   };
 
-
   // AUTO LOGOUT WHEN USER SWITCHES TAB
-  useEffect(() => {
-
-    const handleVisibilityChange = () => {
-
-      if (document.hidden) {
-
-        logout();
-      }
-    };
-
-    document.addEventListener(
-      "visibilitychange",
-      handleVisibilityChange
-    );
-
-    return () => {
-
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibilityChange
-      );
-    };
-
-  }, []);
-
 
   return (
 
@@ -96,6 +70,7 @@ function App() {
           <Link to="/help">Help</Link>
 
           <Link to="/">Home</Link>
+          <Link to="/history">History</Link>
 
           {!isLoggedIn ? (
 
@@ -150,6 +125,10 @@ function App() {
           path="/"
           element={<Home />}
         />
+        <Route
+  path="/history"
+  element={isLoggedIn ? <History /> : <Navigate to="/login" />}
+/>
         <Route
   path="/help"
   element={
