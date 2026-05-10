@@ -5,59 +5,61 @@ function Help() {
       specialization: "General Physician",
       phone: "+91 9876543210",
       hospital: "Apollo Hospital",
+      image:
+        "https://cdn-icons-png.flaticon.com/512/2785/2785482.png",
     },
     {
       name: "Dr. Rahul Verma",
       specialization: "Cardiologist",
       phone: "+91 9123456780",
       hospital: "Fortis Hospital",
+      image:
+        "https://cdn-icons-png.flaticon.com/512/2785/2785482.png",
     },
     {
       name: "Dr. Sneha Reddy",
       specialization: "Diabetologist",
       phone: "+91 9988776655",
       hospital: "Care Hospital",
+      image:
+        "https://cdn-icons-png.flaticon.com/512/2785/2785482.png",
     },
   ];
 
   return (
     <div className="help-page">
       <div className="help-container">
-        <h1>Emergency Help & Precautions</h1>
+        <h1>Emergency Doctors</h1>
 
-        <div className="precaution-card">
-          <h2>Important Precautions</h2>
-
-          <ul>
-            <li>Take medicines at the correct scheduled time.</li>
-            <li>Do not skip prescribed dosage.</li>
-            <li>Drink enough water daily.</li>
-            <li>Consult doctor before changing medicines.</li>
-            <li>Keep emergency contact numbers accessible.</li>
-          </ul>
-        </div>
-
-        <h2 className="doctor-title">Emergency Doctors</h2>
+        <p className="help-subtitle">
+          Quickly contact doctors during emergency situations.
+        </p>
 
         <div className="doctor-grid">
           {doctors.map((doctor, index) => (
             <div className="doctor-card" key={index}>
+              <img
+                src={doctor.image}
+                alt={doctor.name}
+                className="doctor-image"
+              />
+
               <h3>{doctor.name}</h3>
 
-              <p>
-                <strong>Specialization:</strong> {doctor.specialization}
-              </p>
+              <p>{doctor.specialization}</p>
 
-              <p>
-                <strong>Hospital:</strong> {doctor.hospital}
-              </p>
+              <div className="doctor-info">
+                <span>{doctor.hospital}</span>
+              </div>
 
-              <p>
-                <strong>Phone:</strong> {doctor.phone}
-              </p>
+              <div className="doctor-phone">
+                📞 {doctor.phone}
+              </div>
 
               <a href={`tel:${doctor.phone}`}>
-                <button>Call Doctor</button>
+                <button className="call-btn">
+                  Call Doctor
+                </button>
               </a>
             </div>
           ))}

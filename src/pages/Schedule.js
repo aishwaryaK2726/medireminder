@@ -4,16 +4,6 @@ import axios from "axios";
 function Schedule() {
   const [medicines, setMedicines] = useState([]);
 
-  const days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
-
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
@@ -34,36 +24,62 @@ function Schedule() {
     fetchMedicines();
   }, []);
 
+  const getTimePeriod = (time) => {
+    const hour = Number(time.split(":")[0]);
+
+    if (hour >= 5 && hour < 12) return "Morning";
+    if (hour >= 12 && hour < 17) return "Afternoon";
+    if (hour >= 17 && hour < 21) return "Evening";
+    return "Night";
+  };
+
+  const scheduleGroups = {
+    Morning: medicines.filter((med) => getTimePeriod(med.time) === "Morning"),
+    Afternoon: medicines.filter(
+      (med) => getTimePeriod(med.time) === "Afternoon"
+    ),
+    Evening: medicines.filter((med) => getTimePeriod(med.time) === "Evening"),
+    Night: medicines.filter((med) => getTimePeriod(med.time) === "Night"),
+  };
+
   return (
     <div className="schedule-page">
       <div className="schedule-container">
-        <h1>Weekly Medicine Schedule</h1>
+        <h1>Medicine Schedule Diagram</h1>
 
-        <table className="schedule-table">
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Medicine</th>
-              <th>Dosage</th>
-              <th>Time</th>
-              <th>Frequency</th>
-            </tr>
-          </thead>
+        <p className="schedule-subtitle">
+          Your medicines are arranged visually based on the time of the day.
+        </p>
 
-          <tbody>
-            {days.map((day) =>
-              medicines.map((med) => (
-                <tr key={`${day}-${med._id}`}>
-                  <td>{day}</td>
-                  <td>{med.medicineName}</td>
-                  <td>{med.dosage}</td>
-                  <td>{med.time}</td>
-                  <td>{med.frequency}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="timeline">
+          {Object.keys(scheduleGroups).map((period) => (
+            <div className="timeline-block" key={period}>
+              <div className="timeline-circle">
+                {period === "Morning" && "🌅"}
+                {period === "Afternoon" && "☀️"}
+                {period === "Evening" && "🌇"}
+                {period === "Night" && "🌙"}
+              </div>
+
+              <div className="timeline-content">
+                <h2>{period}</h2>
+
+                {scheduleGroups[period].length === 0 ? (
+                  <p className="no-medicine">No medicine scheduled</p>
+                ) : (
+                  scheduleGroups[period].map((med) => (
+                    <div className="schedule-medicine-card" key={med._id}>
+                      <h3>{med.medicineName}</h3>
+                      <p>{med.dosage}</p>
+                      <span>{med.time}</span>
+                      <small>{med.frequency}</small>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

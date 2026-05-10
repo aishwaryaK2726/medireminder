@@ -98,12 +98,21 @@ function Dashboard() {
 
   const weeklyTaken = days.map((day) => {
     return history.filter((item) => {
-      const historyDay = new Date(item.date).toLocaleDateString(
-        "en-US",
-        { weekday: "long" }
-      );
+      const historyDay = new Date(item.date).toLocaleDateString("en-US", {
+        weekday: "long",
+      });
 
       return historyDay === day && item.status === "Taken";
+    }).length;
+  });
+
+  const weeklyMissed = days.map((day) => {
+    return history.filter((item) => {
+      const historyDay = new Date(item.date).toLocaleDateString("en-US", {
+        weekday: "long",
+      });
+
+      return historyDay === day && item.status === "Missed";
     }).length;
   });
 
@@ -113,10 +122,25 @@ function Dashboard() {
       {
         label: "Medicines Taken",
         data: weeklyTaken,
-        backgroundColor: "#0f75d1",
+        backgroundColor: "#22c55e",
+        borderRadius: 8,
+      },
+      {
+        label: "Medicines Missed",
+        data: weeklyMissed,
+        backgroundColor: "#ef4444",
         borderRadius: 8,
       },
     ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+    },
   };
 
   return (
@@ -124,23 +148,28 @@ function Dashboard() {
       <div className="dashboard-container">
         <h1>Dashboard</h1>
 
+        <p className="dashboard-subtitle">
+          View your medicine summary, taken medicines, missed medicines, and
+          weekly progress.
+        </p>
+
         <div className="dashboard-cards">
           <div className="analytics-card">
             <h2>Total Medicines</h2>
             <p>{medicineCount}</p>
           </div>
 
-          <div className="analytics-card">
+          <div className="analytics-card taken-card">
             <h2>Taken</h2>
             <p>{takenCount}</p>
           </div>
 
-          <div className="analytics-card">
+          <div className="analytics-card missed-card">
             <h2>Missed</h2>
             <p>{missedCount}</p>
           </div>
 
-          <div className="analytics-card">
+          <div className="analytics-card completion-card">
             <h2>Completion</h2>
             <p>{completionPercentage}%</p>
           </div>
@@ -151,22 +180,20 @@ function Dashboard() {
             <h2>Medicine Completion Status</h2>
 
             {totalHistory > 0 ? (
-              <Pie data={pieData} />
+              <Pie data={pieData} options={chartOptions} />
             ) : (
-              <p className="empty-chart">
-                No history data available yet.
-              </p>
+              <p className="empty-chart">No history data available yet.</p>
             )}
           </div>
 
           <div className="chart-card">
-            <h2>Weekly Progress</h2>
+            <h2>Weekly Medicine Progress</h2>
 
             {totalHistory > 0 ? (
-              <Bar data={weeklyData} />
+              <Bar data={weeklyData} options={chartOptions} />
             ) : (
               <p className="empty-chart">
-                Mark medicines as taken to view progress.
+                Mark medicines as taken to view weekly progress.
               </p>
             )}
           </div>

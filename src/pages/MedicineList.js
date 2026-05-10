@@ -36,9 +36,11 @@ function MedicineList() {
         },
       });
 
+      toast.success("Medicine deleted successfully");
       fetchMedicines();
     } catch (error) {
       console.log(error.response?.data || error);
+      toast.error("Error deleting medicine");
     }
   };
 
@@ -68,7 +70,7 @@ function MedicineList() {
       toast.success(`${med.medicineName} marked as Taken`);
     } catch (error) {
       console.log(error.response?.data || error);
-      alert("Error marking medicine as taken");
+      toast.error("Error marking medicine as taken");
     }
   };
 
@@ -106,10 +108,6 @@ function MedicineList() {
 
           playAlarm();
 
-          alert(
-            `Reminder: Time to take ${med.medicineName}\nDosage: ${med.dosage}`
-          );
-
           if (
             "Notification" in window &&
             Notification.permission === "granted"
@@ -130,46 +128,74 @@ function MedicineList() {
     return () => clearInterval(interval);
   }, [medicines, notified]);
 
+  const filteredMedicines = medicines.filter((med) =>
+    med.medicineName.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="container">
-      <h2>Medicine List</h2>
+    <div className="container medicine-list-page">
+      <h2>Medicines</h2>
+
+      <p className="medicine-list-info">
+        View all added medicines, mark medicines as taken, edit details, or
+        delete medicines.
+      </p>
 
       <input
         type="text"
         placeholder="Search Medicine"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        className="medicine-search"
       />
 
       {medicines.length === 0 && (
-  <p>No medicines added yet.</p>
-)}
+        <p className="empty-message">No medicines added yet.</p>
+      )}
 
-{medicines
-  .filter((med) =>
-    med.medicineName.toLowerCase().includes(search.toLowerCase())
-  )
-        .map((med) => (
+      {filteredMedicines.length === 0 && medicines.length > 0 && (
+        <p className="empty-message">No matching medicines found.</p>
+      )}
+
+      <div className="medicine-grid">
+        {filteredMedicines.map((med) => (
           <div key={med._id} className="medicine-card">
             <h3>{med.medicineName}</h3>
 
-            <p>Dosage: {med.dosage}</p>
-            <p>Time: {med.time}</p>
-            <p>Frequency: {med.frequency}</p>
+            <p>
+              <strong>Dosage:</strong> {med.dosage}
+            </p>
 
-            <button onClick={() => markAsTaken(med)}>
-              Mark as Taken
-            </button>
+            <p>
+              <strong>Time:</strong> {med.time}
+            </p>
 
-            <Link to={`/edit/${med._id}`}>
-              <button>Edit</button>
-            </Link>
+            <p>
+              <strong>Frequency:</strong> {med.frequency}
+            </p>
 
-            <button onClick={() => deleteMedicine(med._id)}>
-              Delete
-            </button>
+            <div className="medicine-actions">
+              <button
+                className="taken-btn"
+                onClick={() => markAsTaken(med)}
+              >
+                Mark as Taken
+              </button>
+
+              <Link to={`/edit/${med._id}`}>
+                <button className="edit-btn">Edit</button>
+              </Link>
+
+              <button
+                className="delete-btn"
+                onClick={() => deleteMedicine(med._id)}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
+      </div>
     </div>
   );
 }

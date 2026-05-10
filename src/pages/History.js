@@ -9,14 +9,11 @@ function History() {
       try {
         const token = sessionStorage.getItem("token");
 
-        const res = await axios.get(
-          "http://localhost:5000/history",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get("http://localhost:5000/history", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         setHistory(res.data);
       } catch (error) {
@@ -32,39 +29,45 @@ function History() {
       <div className="history-container">
         <h1>Medicine History</h1>
 
-        <table className="history-table">
-          <thead>
-            <tr>
-              <th>Medicine</th>
-              <th>Dosage</th>
-              <th>Time</th>
-              <th>Date</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {history.map((item) => (
-              <tr key={item._id}>
-                <td>{item.medicineName}</td>
-                <td>{item.dosage}</td>
-                <td>{item.time}</td>
-                <td>{item.date}</td>
-                <td>
-                  <span className="taken-badge">
-                    {item.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
         {history.length === 0 && (
-          <p className="empty-history">
-            No medicine history found.
-          </p>
+          <p className="empty-history">No medicine history found.</p>
         )}
+
+        <div className="history-card-grid">
+          {history.map((item) => (
+            <div
+              key={item._id}
+              className={
+                item.status === "Taken"
+                  ? "history-card taken-history-card"
+                  : "history-card missed-history-card"
+              }
+            >
+              <div className="tablet-image-box">
+                <div className="tablet-icon">💊</div>
+              </div>
+
+              <h2>{item.medicineName}</h2>
+
+              <p>{item.dosage}</p>
+
+              <div className="history-details">
+                <span>{item.time}</span>
+                <span>{item.date}</span>
+              </div>
+
+              <div
+                className={
+                  item.status === "Taken"
+                    ? "status-image taken-status"
+                    : "status-image missed-status"
+                }
+              >
+                {item.status === "Taken" ? "✅ Taken" : "❌ Missed"}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
